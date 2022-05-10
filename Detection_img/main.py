@@ -1,58 +1,82 @@
-# USAGE
-# python chat_detection.py --image example.jpg
-#    --cascade_file cascade --cascade_item "chat"
-# verifiez si votre image n'est pas trop grande pour pouvoir visionner Ã  la sortie
-# SI oui vous pouvez la redimensionner dans la ligne 22
 # import the necessary packages
-import cv2
-import numpy as np
+from imutils.video import VideoStream
 import argparse
+# import imutils
 import time
+import cv2
+import os
 
 
-#les arguments à rentrer pour que le programme fonctionne (l'image ou l'on fait la détection et le fichier cascade)
+
+
+
+# construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True,
-    help="path to input image")
-ap.add_argument("-c", "--cascade_file", required=True,
-     help="path to haarcascade file")
-
+ap.add_argument("-c", "--cascade", type=str, help = "path to input directory containing haar cascades")
 args = vars(ap.parse_args())
 
 
-image = cv2.imread(args["image"])                     # lecture de l'image
 
 
-# redimensionnement de l'image
-image = cv2.resize(image,(400, 400)) 
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)        # Converting the image to gray
-cascade = cv2.CascadeClassifier(args["cascade_file"]) # Load your cascade file
+# initialize a dictionary to store our haar cascade detectors
+print("[INFO] loading haar cascades...")
 
 
-# (H, W) = image.shape[:2]
-# a=int(H/100)
-# b=int(W/100)
+detector = cv2.CascadeClassifier(args["cascade"])
 
 
-# Detecting cascade items
-rectangles = cascade.detectMultiScale( gray, scaleFactor = 1.05, minNeighbors = 5, minSize=(20, 20), flags = cv2.CASCADE_SCALE_IMAGE )
-
-for (x, y, w, h) in rectangles :        # puting rectangles around them   
 
 
-    # ROI = gray[ y:y+h , fx:fx+w ]
+# # initialize the video stream and allow the camera sensor to warm up
+print("[INFO] starting video stream...")
+vs = VideoStream(src=0).start()
+time.sleep(2.0)
+# loop over the frames from the video stream
 
-    cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-    
-# Displaying the detection 
-cv2.imshow("Resultat", image)
 
-time.sleep(15)
-# cv2.waitKey(200)
 
-# q=0
-# q = int(input('entrer 1 pour arreter: '))
-# while q!=1 :
-#     q = int(input('entrer 1 pour arreter: '))
 
-# cv2.destroyAllWindows()
+
+
+while True:
+	# grab the frame from the video stream, resize it, and convert it
+	# to grayscale
+	frame = vs.read()
+	frame = cv2.resize(frame, (512, 384))
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+	# perform face detection using the appropriate haar cascade
+
+
+	rect = detector.detectMultiScale(
+		gray, scaleFactor=1.25, minNeighbors=5, minSize=(15, 15),
+		flags=cv2.CASCADE_SCALE_IMAGE)
+
+
+
+
+
+
+        	# loop over the face bounding boxes
+	for (fX, fY, fW, fH) in rect:
+		# extract the face ROI
+
+		faceROI = gray[fY:fY+ fH, fX:fX + fW]
+		# apply eyes detection to the face ROI
+
+
+		# draw the face bounding box on the frame
+		cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH), (0, 255, 0), 2)
+
+
+    # show the output frame
+	cv2.imshow("Frame", frame)
+
+
+	key = cv2.waitKey(1) & 0xFF
+	# if the `q` key was pressed, break from the loop
+	if key == ord("q"):
+		break
+# do a bit of cleanup
+cv2.destroyAllWindows()
+vs.stop()
