@@ -5,13 +5,19 @@ import argparse
 import time
 import cv2
 import os
+from math import exp,log
 
 
+#fonction pour raph
+data = []
+def getData():
+	#print(data)
+	return(data)
 
 
 #on doit donner en paramètre le chemin du dossier cascade
 ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--cascade", type=str, help = "path to input directory containing haar cascades")
+ap.add_argument("-c", "--cascade", type=str, help = "path to input directory containing haar cascades", default="data_v2\cascade.xml")
 args = vars(ap.parse_args())
 
 
@@ -49,15 +55,32 @@ while True:
 
 
 
-	for (fX, fY, fW, fH) in rect:
+	for (i, (fX, fY, fW, fH)) in enumerate(rect):
+
+
+
+		data = [fX,fW]
+		getData()
 
 		cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH), (0, 0, 255), 2)
 
-		print("Sommet du rectangle : ( %s , %s ), longueur : %s, largeur : %s" %(fX,fY,fW,fH)) #abscisses, ordonnée, longueur = largeur
+		# print("Sommet du rectangle : ( %s , %s ), longueur : %s, largeur : %s" %(fX,fY,fW,fH)) #abscisses, ordonnée, longueur = largeur
+
+		distance = int(13315*exp(-0.986*log(fH)))
+
+		
+		#a = [ 582.25 , -9.7464 , 0.0843, -4e-4 , 9e-7 , -8e-10 ]
+		#distance = a[0]*fH**0 + a[1]*fH + a[2]*fH**2 + a[3]*fH**3 + a[4]*fH**4 - a[5]*fH**5 
+
+
+		if 40 < distance < 250:
+
+			print(f"\rDistance à la cible n°{i+1} : {distance}cm",end="")	
+
 
 
 	cv2.imshow("Frame", frame)
-
+	
 
 	key = cv2.waitKey(1) & 0xFF
 	# if the `q` key was pressed, break from the loop
