@@ -1,4 +1,4 @@
-# import the necessary packages
+﻿# import the necessary packages
 from imutils.video import VideoStream
 import argparse
 # import imutils
@@ -6,6 +6,27 @@ import time
 import cv2
 import os
 from math import exp,log
+
+
+#fonction pour envoyer la commande de déplacement
+
+FRAME_SIZE_WIDTH = 512
+
+def commandeMove(x,w):
+
+	ordreMove = 3
+
+	if !( int(x+w/2) > int( FRAME_SIZE_WIDTH/2 ):
+		return( -ordreMove )
+		
+
+	if !( int(x+w/2) < int( FRAME_SIZE_WIDTH/2 ):
+		return( ordreMove )
+
+	print("Cible face à la caméra")
+
+	
+
 
 
 #fonction pour raph
@@ -61,6 +82,8 @@ while True:
 
 		data = [fX,fW]
 		getData()
+		where = commandeMove(fX,fW)
+		print(where)
 
 		cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH), (0, 0, 255), 2)
 
@@ -73,9 +96,9 @@ while True:
 		#distance = a[0]*fH**0 + a[1]*fH + a[2]*fH**2 + a[3]*fH**3 + a[4]*fH**4 - a[5]*fH**5 
 
 
-		if 40 < distance < 250:
+		#if 40 < distance < 250:
 
-			print(f"\rDistance à la cible n°{i+1} : {distance}cm",end="")	
+			#print(f"\rDistance à la cible n°{i+1} : {distance}cm",end="")	
 
 
 
