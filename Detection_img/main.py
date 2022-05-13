@@ -16,11 +16,11 @@ def commandeMove(x,w):
 
 	ordreMove = 3
 
-	if !( int(x+w/2) > int( FRAME_SIZE_WIDTH/2 ):
+	if int(x+w/2) > int( FRAME_SIZE_WIDTH/2 + 6):
 		return( -ordreMove )
 		
 
-	if !( int(x+w/2) < int( FRAME_SIZE_WIDTH/2 ):
+	if int(x+w/2) < int( FRAME_SIZE_WIDTH/2 - 6):
 		return( ordreMove )
 
 	print("Cible face à la caméra")
@@ -36,7 +36,8 @@ def getData():
 	return(data)
 
 
-#on doit donner en paramètre le chemin du dossier cascade
+
+#on doit donner en paramètre le chemin du dossier cascade (le défaut est pour windows)
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--cascade", type=str, help = "path to input directory containing haar cascades", default="data_v2\cascade.xml")
 args = vars(ap.parse_args())
@@ -66,9 +67,8 @@ while True:
 	frame = cv2.resize(frame, (512, 384))
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-	# perform face detection using the appropriate haar cascade
 
-
+	#on detecte la cible
 	rect = detector.detectMultiScale( gray, scaleFactor=1.25, minNeighbors=1, minSize=(5, 5), flags=cv2.CASCADE_SCALE_IMAGE)
 
 
@@ -89,16 +89,19 @@ while True:
 
 		# print("Sommet du rectangle : ( %s , %s ), longueur : %s, largeur : %s" %(fX,fY,fW,fH)) #abscisses, ordonnée, longueur = largeur
 
+		#approche puissance
 		distance = int(13315*exp(-0.986*log(fH)))
 
 		
+
+		#approche polynomiale
 		#a = [ 582.25 , -9.7464 , 0.0843, -4e-4 , 9e-7 , -8e-10 ]
 		#distance = a[0]*fH**0 + a[1]*fH + a[2]*fH**2 + a[3]*fH**3 + a[4]*fH**4 - a[5]*fH**5 
 
 
-		#if 40 < distance < 250:
+		if 40 < distance < 250:
 
-			#print(f"\rDistance à la cible n°{i+1} : {distance}cm",end="")	
+			print(f"\rDistance à la cible n°{i+1} : {distance}cm")	
 
 
 
@@ -109,6 +112,8 @@ while True:
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
-# do a bit of cleanup
+	
+
+ #on ferme la fenetre et on arrete la webcam
 cv2.destroyAllWindows()
 vs.stop()
